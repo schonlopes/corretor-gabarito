@@ -1,132 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Correção de Gabaritos</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; max-width: 600px; }
-    h1 { text-align: center; }
-    label { display: block; margin-top: 10px; }
-    input[type="number"] { width: 60px; margin-left: 10px; }
-    .questao { display: flex; align-items: center; margin-top: 5px; }
-    .config { margin-bottom: 20px; }
-    .botao { margin-top: 20px; }
-    #valoresQuestoes { display: none; margin-top: 10px; }
-    #mensagem { margin-top: 20px; font-weight: bold; }
-  </style>
-</head>
-<body>
-  <h1>Correção de Gabaritos</h1>
-
-  <div class="config">
-    <label for="turma">Selecione a turma:</label>
-    <select id="turma">
-      <option value="Turma A">Turma A</option>
-      <option value="Turma B">Turma B</option>
-    </select>
-
-    <label for="modo">Modo de pontuação:</label>
-    <select id="modo" onchange="atualizarModoPontuacao()">
-      <option value="total">Nota Total da Prova</option>
-      <option value="porquestao">Nota por Questão</option>
-    </select>
-
-    <div id="configNotaTotal">
-      <label for="notaTotal">Nota total da prova:</label>
-      <input type="number" id="notaTotal" min="1" max="100" value="10" oninput="calcularNotaPorQuestao()" />
-    </div>
-  </div>
-
-  <div id="valoresQuestoes">
-    <h3>Valor por questão:</h3>
-  </div>
-
-  <label for="numeroAluno">Número do Aluno:</label>
-  <input type="number" id="numeroAluno" min="1" max="99" value="1" />
-
-  <button class="botao" onclick="iniciarCorrecao()">Iniciar Correção</button>
-
-  <div id="mensagem"></div>
-
-  <script>
-    const valoresQuestoesDiv = document.getElementById("valoresQuestoes");
-    const mensagemDiv = document.getElementById("mensagem");
-
-    function gerarCamposQuestoes(valorPadrao = 1) {
-      valoresQuestoesDiv.innerHTML = '';
-      for (let i = 1; i <= 10; i++) {
-        const linha = document.createElement("div");
-        linha.className = "questao";
-        linha.innerHTML = `
-          <label>Q${i}:</label>
-          <input type="number" id="q${i}" min="0" step="0.1" value="${valorPadrao}" />
-        `;
-        valoresQuestoesDiv.appendChild(linha);
-      }
-    }
-
-    function atualizarModoPontuacao() {
-      const modo = document.getElementById("modo").value;
-      const notaTotalDiv = document.getElementById("configNotaTotal");
-      if (modo === "porquestao") {
-        notaTotalDiv.style.display = "none";
-        valoresQuestoesDiv.style.display = "block";
-        gerarCamposQuestoes();
-      } else {
-        notaTotalDiv.style.display = "block";
-        valoresQuestoesDiv.style.display = "none";
-      }
-    }
-
-    function calcularNotaPorQuestao() {
-      const total = parseFloat(document.getElementById("notaTotal").value);
-      const valorUnitario = (total / 10).toFixed(2);
-      console.log(`Nota total: ${total} | Valor por questão: ${valorUnitario}`);
-    }
-
-    function iniciarCorrecao() {
-      const turma = document.getElementById("turma").value;
-      const modo = document.getElementById("modo").value;
-      const numeroAluno = parseInt(document.getElementById("numeroAluno").value);
-      let valores;
-
-      if (modo === "porquestao") {
-        valores = [];
-        for (let i = 1; i <= 10; i++) {
-          valores.push(parseFloat(document.getElementById(`q${i}`).value));
-        }
-      } else {
-        const total = parseFloat(document.getElementById("notaTotal").value);
-        const valorUnitario = parseFloat((total / 10).toFixed(2));
-        valores = Array(10).fill(valorUnitario);
-      }
-
-      const notaFinal = valores.reduce((a, b) => a + b, 0).toFixed(2);
-
-      fetch("https://script.google.com/macros/s/AKfycbxNKl55qEeSlfz4nYJxCF9JyIOIkyUyFkHjNDqiJXI5PAxJIG_8EljWowGaurLG4JEIkQ/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          turma: turma,
-          numero: numeroAluno,
-          nota: notaFinal
-        })
-      })
-      .then(res => res.text())
-      .then(msg => {
-        mensagemDiv.style.color = 'green';
-        mensagemDiv.textContent = msg;
-      })
-      .catch(err => {
-        mensagemDiv.style.color = 'red';
-        mensagemDiv.textContent = "Erro ao enviar nota: " + err;
-      });
-    }
-
-    window.onload = function () {
-      atualizarModoPontuacao();
-    }
-  </script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Teste de Envio</title>
+  </head>
+  <body>
+    <h2>Teste de Correção</h2>
+    <form action="https://script.google.com/macros/s/AKfycbxNKl55qEeSlfz4nYJxCF9JyIOIkyUyFkHjNDqiJXI5PAxJIG_8EljWowGaurLG4JEIkQ/exec" method="post">
+      <label>Turma:
+        <input type="text" name="turma" value="1A" />
+      </label><br><br>
+      <label>Número:
+        <input type="number" name="numero" value="1" />
+      </label><br><br>
+      <label>Nota:
+        <input type="number" name="nota" step="0.1" value="10" />
+      </label><br><br>
+      <button type="submit">Enviar Nota</button>
+    </form>
+  </body>
 </html>
