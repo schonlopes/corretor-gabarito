@@ -13,6 +13,7 @@
     .config { margin-bottom: 20px; }
     .botao { margin-top: 20px; }
     #valoresQuestoes { display: none; margin-top: 10px; }
+    #mensagem { margin-top: 20px; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -46,8 +47,11 @@
 
   <button class="botao" onclick="iniciarCorrecao()">Iniciar Correção</button>
 
+  <div id="mensagem"></div>
+
   <script>
     const valoresQuestoesDiv = document.getElementById("valoresQuestoes");
+    const mensagemDiv = document.getElementById("mensagem");
 
     function gerarCamposQuestoes(valorPadrao = 1) {
       valoresQuestoesDiv.innerHTML = '';
@@ -100,7 +104,7 @@
 
       const notaFinal = valores.reduce((a, b) => a + b, 0).toFixed(2);
 
-      fetch("https://script.google.com/macros/s/AKfycbz67TpPa-EKOitHU-ueyxWptF2zCl6jQELsin9l4z-LM97fukusiKc__XT4lFUqU6QhjQ/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbxNKl55qEeSlfz4nYJxCF9JyIOIkyUyFkHjNDqiJXI5PAxJIG_8EljWowGaurLG4JEIkQ/exec", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -110,8 +114,14 @@
         })
       })
       .then(res => res.text())
-      .then(msg => alert(msg))
-      .catch(err => alert("Erro ao enviar nota: " + err));
+      .then(msg => {
+        mensagemDiv.style.color = 'green';
+        mensagemDiv.textContent = msg;
+      })
+      .catch(err => {
+        mensagemDiv.style.color = 'red';
+        mensagemDiv.textContent = "Erro ao enviar nota: " + err;
+      });
     }
 
     window.onload = function () {
